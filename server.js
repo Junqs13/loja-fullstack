@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { connectDatabase } from './config/database.js';
 import userRoutes from './routes/userRoutes.js';
 import productRoutes from './routes/productRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/users', userRoutes); // <-- 3. CONECTAR AS ROTAS
 app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, console.log(`Servidor rodando na porta ${PORT}`));
