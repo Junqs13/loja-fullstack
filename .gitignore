@@ -1,0 +1,14 @@
+# Arquivo de segredos
+.env
+
+# Dependências
+node_modules/
+frontend/node_modules/
+
+# Arquivos de build do frontend
+frontend/build/
+
+# Logs do NPM
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
