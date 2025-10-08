@@ -119,4 +119,74 @@ const updateUserProfile = async (req, res) => {
         res.status(400).json({ message: 'Erro ao atualizar usuário' });
     }
 };
-export { registerUser, authUser, getUserProfile, updateUserProfile };
+// @desc    Buscar todos os usuários (admin)
+// @route   GET /api/users
+// @access  Privado/Admin
+const getUsers = async (req, res) => {
+    try {
+        const users = await User.find({});
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: "Erro no servidor" });
+    }
+};
+// @desc    Deletar usuário (admin)
+// @route   DELETE /api/users/:id
+// @access  Privado/Admin
+const deleteUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (user) {
+            await user.deleteOne();
+            res.json({ message: 'Usuário removido com sucesso' });
+        } else {
+            res.status(404).json({ message: 'Usuário não encontrado' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+};
+// @desc    Buscar usuário por ID (admin)
+// @route   GET /api/users/:id
+// @access  Privado/Admin
+const getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id).select('-password');
+        if(user) {
+            res.json(user);
+        } else {
+            res.status(404).json({ message: 'Usuário não encontrado' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+};
+
+// @desc    Atualizar usuário (admin)
+// @route   PUT /api/users/:id
+// @access  Privado/Admin
+const updateUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (user) {
+            user.name = req.body.name || user.name;
+            user.email = req.body.email || user.email;
+            user.isAdmin = req.body.isAdmin;
+
+            const updatedUser = await user.save();
+            res.json({
+                _id: updatedUser._id,
+                name: updatedUser.name,
+                email: updatedUser.email,
+                isAdmin: updatedUser.isAdmin,
+            });
+        } else {
+            res.status(404).json({ message: 'Usuário não encontrado' });
+        }
+    } catch (error) {
+        res.status(400).json({ message: 'Erro ao atualizar usuário' });
+    }
+};
+export { registerUser, authUser, getUserProfile, updateUserProfile, getUsers, deleteUser, getUserById, updateUser  };

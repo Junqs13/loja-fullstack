@@ -1,7 +1,6 @@
-// seeder.js
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import users from './data/users.js'; // Precisaremos de um usuário admin
+import users from './data/users.js';
 import products from './data/products.js';
 import User from './models/userModel.js';
 import Product from './models/productModel.js';
@@ -36,5 +35,22 @@ const importData = async () => {
   }
 };
 
-// Roda a função de importação
-importData();
+const destroyData = async () => {
+    try {
+        await Product.deleteMany();
+        await User.deleteMany();
+        
+        console.log('Data Destroyed!');
+        process.exit();
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        process.exit(1);
+    }
+};
+
+// Verifica se o comando para destruir foi passado na linha de comando
+if (process.argv[2] === '-d') {
+    destroyData();
+} else {
+    importData();
+}
