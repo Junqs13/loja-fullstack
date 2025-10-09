@@ -87,5 +87,34 @@ const getMyOrders = async (req, res) => {
         res.status(500).json({ message: 'Erro no servidor' });
     }
 };
+// @desc    Buscar todos os pedidos (admin)
+// @route   GET /api/orders
+// @access  Privado/Admin
+const getOrders = async (req, res) => {
+    try {
+        const orders = await Order.find({}).populate('user', 'id name');
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ message: "Erro no servidor" });
+    }
+};
 
-export { addOrderItems, getOrderById, updateOrderToPaid, getMyOrders  };
+// @desc    Atualizar pedido para entregue (admin)
+// @route   PUT /api/orders/:id/deliver
+// @access  Privado/Admin
+const updateOrderToDelivered = async (req, res) => {
+    try {
+        const order = await Order.findById(req.params.id);
+        if (order) {
+            order.isDelivered = true;
+            order.deliveredAt = Date.now();
+            const updatedOrder = await order.save();
+            res.json(updatedOrder);
+        } else {
+            res.status(404).json({ message: 'Pedido não encontrado' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+};
+export { addOrderItems, getOrderById, updateOrderToPaid, getMyOrders, getOrders, updateOrderToDelivered  };

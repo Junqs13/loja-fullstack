@@ -6,7 +6,13 @@ import Product from '../models/productModel.js';
 // @access  Público
 const getProducts = async (req, res) => {
   try {
-    const products = await Product.find({});
+    const keyword = req.query.keyword ? {
+        name: {
+            $regex: req.query.keyword,
+            $options: 'i' // 'i' para case-insensitive
+        }
+    } : {};
+    const products = await Product.find({...keyword});
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: 'Erro no servidor' });
@@ -94,5 +100,17 @@ const updateProduct = async (req, res) => {
         res.status(500).json({ message: 'Erro no servidor' });
     }
 };
+// @desc    Buscar os melhores produtos (para o carrossel)
+// @route   GET /api/products/top
+// @access  Público
+const getTopProducts = async (req, res) => {
+    try {
+        // Encontra produtos, ordena pelo preço em ordem decrescente e limita a 3
+        const products = await Product.find({}).sort({ price: -1 }).limit(3);
+        res.json(products);
+    } catch (error) {
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+};
 
-export { getProducts, getProductById, createProduct, deleteProduct, updateProduct  };
+export { getProducts, getProductById, createProduct, deleteProduct, updateProduct, getTopProducts  };
