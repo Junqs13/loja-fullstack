@@ -1,66 +1,130 @@
-// controllers/productController.js
 import Product from '../models/productModel.js';
 
-// @desc    Buscar todos os produtos
-// @route   GET /api/products
-// @access  Público
+// Função auxiliar para traduzir um produto para o idioma solicitado
+const translateProduct = (product, lang) => {
+    return {
+        _id: product._id,
+        user: product.user,
+        name: product.name[lang] || product.name.pt,
+        image: product.image,
+        brand: product.brand[lang] || product.brand.pt,
+        category: product.category[lang] || product.category.pt,
+        description: product.description[lang] || product.description.pt,
+        price: product.price,
+        countInStock: product.countInStock,
+        createdAt: product.createdAt,
+        updatedAt: product.updatedAt,
+    };
+};
+
 const getProducts = async (req, res) => {
   try {
+    // LINHA DE DEPURAÇÃO
+    console.log('GET /api/products -> Cabeçalho Accept-Language:', req.headers['accept-language']);
+
+    const lang = (req.headers['accept-language'] || 'pt').split(',')[0].substring(0, 2);
     const keyword = req.query.keyword ? {
-        name: {
-            $regex: req.query.keyword,
-            $options: 'i' // 'i' para case-insensitive
-        }
+        $or: [
+            { 'name.pt': { $regex: req.query.keyword, $options: 'i' } },
+            { 'name.en': { $regex: req.query.keyword, $options: 'i' } }
+        ]
     } : {};
-    const products = await Product.find({...keyword});
-    res.json(products);
+    const products = await Product.find({ ...keyword });
+    res.json(products.map(p => translateProduct(p, lang)));
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Erro no servidor' });
   }
 };
 
-// @desc    Buscar um único produto por ID
-// @route   GET /api/products/:id
-// @access  Público
 const getProductById = async (req, res) => {
   try {
+    // LINHA DE DEPURAÇÃO
+    console.log(`GET /api/products/${req.params.id} -> Cabeçalho Accept-Language:`, req.headers['accept-language']);
+    
+    const lang = (req.headers['accept-language'] || 'pt').split(',')[0].substring(0, 2);
     const product = await Product.findById(req.params.id);
-
     if (product) {
-      res.json(product);
+      res.json(translateProduct(product, lang));
     } else {
       res.status(404).json({ message: 'Produto não encontrado' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Produto não encontrado' });
+    console.error(error);
+    res.status(500).json({ message: 'Erro no servidor' });
   }
 };
-// @desc    Criar um produto (admin)
-// @route   POST /api/products
-// @access  Privado/Admin
-const createProduct = async (req, res) => {
-    try {
-        const product = new Product({
-            name: 'Produto de Amostra',
-            price: 0,
-            user: req.user._id,
-            image: '/images/sample.jpg',
-            brand: 'Marca de Amostra',
-            category: 'Categoria de Amostra',
-            countInStock: 0,
-            description: 'Descrição de Amostra',
-        });
 
-        const createdProduct = await product.save();
-        res.status(201).json(createdProduct);
+// NOVA FUNÇÃO
+const getProductForEdit = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (product) {
+            res.json(product); // Retorna o objeto completo, sem tradução
+        } else {
+            res.status(404).json({ message: 'Produto não encontrado' });
+        }
     } catch (error) {
+        console.error(error);
         res.status(500).json({ message: 'Erro no servidor' });
     }
 };
 
-// @desc    Deletar um produto (admin)
-// @route   DELETE /api/products/:id
-// @access  Privado/Admin
+const getTopProducts = async (req, res) => {
+    try {
+        const lang = (req.headers['accept-language'] || 'pt').split(',')[0].substring(0, 2);
+        const products = await Product.find({}).sort({ price: -1 }).limit(3);
+        res.json(products.map(p => translateProduct(p, lang)));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+};
+
+const createProduct = async (req, res) => {
+    try {
+        const product = new Product({
+            name: { pt: 'Produto de Amostra', en: 'Sample Product' },
+            price: 0,
+            user: req.user._id,
+            image: '/images/sample.jpg',
+            brand: { pt: 'Marca de Amostra', en: 'Sample Brand' },
+            category: { pt: 'Categoria de Amostra', en: 'Sample Category' },
+            countInStock: 0,
+            description: { pt: 'Descrição de Amostra', en: 'Sample Description' },
+        });
+        const createdProduct = await product.save();
+        res.status(201).json(createdProduct);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Erro no servidor' });
+    }
+};
+
+const updateProduct = async (req, res) => {
+    try {
+        const { name, price, description, image, brand, category, countInStock } = req.body;
+        const product = await Product.findById(req.params.id);
+        if (product) {
+            product.name = name;
+            product.price = price;
+            product.description = description;
+            product.image = image;
+            product.brand = brand;
+            product.category = category;
+            product.countInStock = countInStock;
+            const updatedProduct = await product.save();
+            const lang = req.headers['accept-language'] || 'pt';
+            res.json(translateProduct(updatedProduct, lang));
+        } else {
+            res.status(404).json({ message: 'Produto não encontrado' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ message: 'Erro ao atualizar o produto' });
+    }
+};
+
 const deleteProduct = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);
@@ -71,46 +135,17 @@ const deleteProduct = async (req, res) => {
             res.status(404).json({ message: 'Produto não encontrado' });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Erro no servidor' });
-    }
-};
-// @desc    Atualizar um produto (admin)
-// @route   PUT /api/products/:id
-// @access  Privado/Admin
-const updateProduct = async (req, res) => {
-    try {
-        const { name, price, description, image, brand, category, countInStock } = req.body;
-        const product = await Product.findById(req.params.id);
-
-        if (product) {
-            product.name = name;
-            product.price = price;
-            product.description = description;
-            product.image = image;
-            product.brand = brand;
-            product.category = category;
-            product.countInStock = countInStock;
-
-            const updatedProduct = await product.save();
-            res.json(updatedProduct);
-        } else {
-            res.status(404).json({ message: 'Produto não encontrado' });
-        }
-    } catch (error) {
-        res.status(500).json({ message: 'Erro no servidor' });
-    }
-};
-// @desc    Buscar os melhores produtos (para o carrossel)
-// @route   GET /api/products/top
-// @access  Público
-const getTopProducts = async (req, res) => {
-    try {
-        // Encontra produtos, ordena pelo preço em ordem decrescente e limita a 3
-        const products = await Product.find({}).sort({ price: -1 }).limit(3);
-        res.json(products);
-    } catch (error) {
+        console.error(error);
         res.status(500).json({ message: 'Erro no servidor' });
     }
 };
 
-export { getProducts, getProductById, createProduct, deleteProduct, updateProduct, getTopProducts  };
+export { 
+    getProducts, 
+    getProductById, 
+    deleteProduct, 
+    createProduct, 
+    updateProduct, 
+    getTopProducts,
+    getProductForEdit 
+};

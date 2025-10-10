@@ -5,8 +5,9 @@ import {
   getProductById,
   deleteProduct,
   createProduct,
-  updateProduct, 
-  getTopProducts
+  updateProduct,
+  getTopProducts,
+  getProductForEdit, // IMPORTAÇÃO ATUALIZADA
 } from '../controllers/productController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
@@ -14,11 +15,14 @@ router.route('/')
   .get(getProducts)
   .post(protect, admin, createProduct);
 
-router.get('/top', getTopProducts); 
+router.get('/top', getTopProducts);
 
 router.route('/:id')
   .get(getProductById)
   .delete(protect, admin, deleteProduct)
   .put(protect, admin, updateProduct);
+
+// NOVA ROTA
+router.route('/:id/edit').get(protect, admin, getProductForEdit);
 
 export default router;
