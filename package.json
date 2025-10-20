@@ -4,16 +4,13 @@
   "description": "Loja Full Stack MERN",
   "type": "module",
   "main": "server.js",
- "scripts": {
+  "scripts": {
     "start": "node server.js",
     "server": "nodemon server.js",
     "client": "npm start --prefix frontend",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "data:import": "node seeder.js",
     "data:destroy": "node seeder.js -d"
-  
-  
-    
   },
   "author": "Emerson",
   "license": "ISC",
@@ -26,6 +23,7 @@
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
+    "cypress": "^15.5.0",
     "nodemon": "^3.1.10"
   }
 }
