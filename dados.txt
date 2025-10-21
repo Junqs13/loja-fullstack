@@ -1,0 +1,2 @@
+
+ADMIN_NETIFLY=admin@admin.com SENHA=senha123
