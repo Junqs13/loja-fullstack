@@ -206,7 +206,7 @@ const updateUser = async (req, res) => {
                 _id: updatedUser._id,
                 name: updatedUser.name,
                 email: updatedUser.email,
-                isAdmin: updatedUser.isAdmin,
+               
             });
         } else {
             res.status(404).json({ message: 'Usuário não encontrado' });

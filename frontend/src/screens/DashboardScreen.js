@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Row, Col, Card, Table, Button, Form } from 'react-bootstrap'; 
-import { LinkContainer } from 'react-router-bootstrap'; // 1. IMPORTADO
+import { LinkContainer } from 'react-router-bootstrap'; 
 import axios from 'axios'; 
 import DatePicker from 'react-datepicker'; 
 import 'react-datepicker/dist/react-datepicker.css'; 
@@ -24,6 +24,9 @@ import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { getOrderSummary } from '../actions/orderActions';
 import { useTranslation } from 'react-i18next';
+// --- 1. IMPORTAR CONSTANTES DA API ---
+// (Para as chamadas axios feitas DIRETAMENTE neste ficheiro)
+import { BASE_URL, PRODUCTS_URL, ORDERS_URL } from '../constants/apiConstants.js';
 
 // Registra os componentes necessários do Chart.js
 ChartJS.register(
@@ -50,7 +53,6 @@ const DashboardScreen = () => {
     
     // States para relatórios operacionais
     const [lowStock, setLowStock] = useState({ loading: true, error: null, products: [] });
-    // 2. NOVO STATE PARA PEDIDOS PENDENTES
     const [pendingOrders, setPendingOrders] = useState({ loading: true, error: null, orders: [] });
 
 
@@ -63,14 +65,12 @@ const DashboardScreen = () => {
 
     // --- USE EFFECTS ---
     useEffect(() => {
-        // Busca o resumo principal do dashboard (pedidos)
         dispatch(getOrderSummary());
     }, [dispatch]);
 
-    // 3. USEEFFECT ATUALIZADO (BUSCA STOCK E PEDIDOS PENDENTES)
     useEffect(() => {
         const fetchOperationalData = async () => {
-            if (!userInfo) return; // Sai se não estiver logado
+            if (!userInfo) return; 
             
             const config = {
                 headers: { Authorization: `Bearer ${userInfo.token}` },
@@ -78,7 +78,8 @@ const DashboardScreen = () => {
 
             // Fetch Low Stock
             try {
-                const { data } = await axios.get('/api/products/stock/low', config);
+                // --- 2. USAR AS CONSTANTES DA API ---
+                const { data } = await axios.get(`${BASE_URL}${PRODUCTS_URL}/stock/low`, config);
                 setLowStock({ loading: false, products: data, error: null });
             } catch (err) {
                 const message = err.response && err.response.data.message ? err.response.data.message : err.message;
@@ -87,7 +88,8 @@ const DashboardScreen = () => {
 
             // Fetch Pending Orders
             try {
-                const { data } = await axios.get('/api/orders/pending', config);
+                // --- 2. USAR AS CONSTANTES DA API ---
+                const { data } = await axios.get(`${BASE_URL}${ORDERS_URL}/pending`, config);
                 setPendingOrders({ loading: false, orders: data, error: null });
             } catch (err) {
                 const message = err.response && err.response.data.message ? err.response.data.message : err.message;
@@ -97,7 +99,7 @@ const DashboardScreen = () => {
 
         fetchOperationalData();
         
-    }, [userInfo]); // Depende do userInfo estar disponível
+    }, [userInfo]);
 
     // --- HANDLERS ---
     const exportHandler = async () => {
@@ -123,7 +125,8 @@ const DashboardScreen = () => {
         };
 
         try {
-            const { data } = await axios.get('/api/orders/export', { ...config, params });
+            // --- 2. USAR AS CONSTANTES DA API ---
+            const { data } = await axios.get(`${BASE_URL}${ORDERS_URL}/export`, { ...config, params });
             const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -220,7 +223,6 @@ const DashboardScreen = () => {
         <>
             <h1>{t('dashboard.title', 'Dashboard')}</h1>
             
-            {/* O loading principal (dos gráficos) */}
             {loading ? <Loader /> : error ? <Message variant='danger'>{error}</Message> : (
                 summary ? (
                     <>
@@ -330,7 +332,7 @@ const DashboardScreen = () => {
                             </Col>
                         </Row>
                         
-                        {/* --- 4. NOVA LINHA: RELATÓRIOS OPERACIONAIS (Lado a Lado) --- */}
+                        {/* --- LINHA: RELATÓRIOS OPERACIONAIS (Lado a Lado) --- */}
                         <Row>
                             {/* --- RELATÓRIO DE PEDIDOS PENDENTES --- */}
                             <Col md={6}>
@@ -350,7 +352,8 @@ const DashboardScreen = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {pendingOrders.orders.length > 0 ? (
+                                                {/* --- 3. CORREÇÃO (Array.isArray) --- */}
+                                                {Array.isArray(pendingOrders.orders) && pendingOrders.orders.length > 0 ? (
                                                     pendingOrders.orders.map((order) => (
                                                         <tr key={order._id}>
                                                             <td>{order._id}</td>
@@ -395,10 +398,10 @@ const DashboardScreen = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {lowStock.products.length > 0 ? (
+                                                {/* --- 3. CORREÇÃO (Array.isArray) --- */}
+                                                {Array.isArray(lowStock.products) && lowStock.products.length > 0 ? (
                                                     lowStock.products.map((product) => (
                                                         <tr key={product._id}>
-                                                            {/* Atualizado para usar o Link para a página de edição do produto */}
                                                             <td>
                                                                 <LinkContainer to={`/admin/product/${product._id}/edit`}>
                                                                     <Button variant="light" size="sm" className="w-100 text-start">
@@ -467,7 +470,8 @@ const DashboardScreen = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {summary?.topCustomers?.length > 0 ? (
+                                            {/* --- 3. CORREÇÃO (Array.isArray) --- */}
+                                            {Array.isArray(summary.topCustomers) && summary.topCustomers.length > 0 ? (
                                                 summary.topCustomers.map((customer, index) => (
                                                     <tr key={index}>
                                                         <td>{customer.name}</td>
