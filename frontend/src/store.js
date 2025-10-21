@@ -51,11 +51,11 @@ const reducer = combineReducers({
   orderCreate: orderCreateReducer,
   orderDetails: orderDetailsReducer,
   orderPay: orderPayReducer,
-  orderDeliver: orderDeliverReducer,
+  orderDeliver: orderDeliverReducer, // Apenas esta fica
   orderListMy: orderListMyReducer,
   orderList: orderListReducer,
   theme: themeReducer,
-  orderDeliver: orderDeliverReducer,
+  // orderDeliver: orderDeliverReducer, // <-- ESTA LINHA FOI REMOVIDA
   orderSummary: orderSummaryReducer,
 });
 
