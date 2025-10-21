@@ -1,0 +1,165 @@
+{
+    "header": {
+        "cart": "Cart",
+        "signIn": "Sign In",
+        "profileLink": "Profile",
+        "logout": "Logout",
+        "admin": "Admin",
+        "users": "Users",
+        "products": "Products",
+        "orders": "Orders"
+    
+    },
+      "footer": {
+        "storeName": "Full Stack Shop",
+        "storeDescription": "Your destination for the best tech products and accessories.",
+        "quickLinks": "Quick Links",
+        "aboutUs": "About Us",
+        "contact": "Contact",
+        "privacyPolicy": "Privacy Policy",
+        "followUs": "Follow Us",
+        "copyright": "Copyright"
+
+    },
+    "loading": "Loading...",
+    "searchPlaceholder": "Search Products...",
+    "searchButton": "Search",
+    "latestProducts": "Latest Products",
+    "goBack": "Go Back",
+    "price": "Price",
+    "description": "Description",
+    "status": "Status",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "quantity": "Qty",
+    "addToCart": "Add To Cart",
+    "shoppingCart": "Shopping Cart",
+    "emptyCart": "Your cart is empty",
+    "subtotal": "Subtotal",
+    "items": "items",
+    "proceedToCheckout": "Proceed To Checkout",
+
+    "about": {
+        "title": "About Us",
+        "p1": "Welcome to the Full Stack Shop! We are a team passionate about technology, dedicated to bringing you the best and latest electronic products.",
+        "p2": "Our mission is to provide an exceptional shopping experience, with a carefully selected product catalog, competitive prices, and top-notch customer service. This project was developed following the best practices of modern web development, using the MERN stack (MongoDB, Express, React, Node.js)."
+    },
+    "contact": {
+        "title": "Contact",
+        "p1": "Do you have any questions, suggestions, or feedback? We would love to hear from you!",
+        "email": "Email",
+        "phone": "Phone",
+        "address": "Address"
+    },
+    "privacy": {
+        "title": "Privacy Policy",
+        "p1": "Your privacy is important to us. It is the Full Stack Shop's policy to respect your privacy regarding any information we may collect from you on the website.",
+        "p2": "We only ask for personal information when we truly need it to provide a service to you. We do so by fair and lawful means, with your knowledge and consent. We also let you know why we’re collecting it and how it will be used.",
+        "p3": "We only retain collected information for as long as necessary to provide you with your requested service. What data we store, we’ll protect within commercially acceptable means to prevent loss and theft, as well as unauthorized access, disclosure, copying, use or modification."
+    },
+    
+    "login": {
+        "title": "Sign In",
+        "emailLabel": "Email Address",
+        "emailPlaceholder": "Enter email",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter password",
+        "signInButton": "Sign In",
+        "newUserPrompt": "New Customer?",
+        "registerLink": "Register"
+    },
+    "register": {
+        "title": "Sign Up",
+        "nameLabel": "Name",
+        "namePlaceholder": "Enter name",
+        "passwordConfirmLabel": "Confirm Password",
+        "passwordConfirmPlaceholder": "Confirm password",
+        "registerButton": "Register",
+        "hasAccountPrompt": "Have an Account?",
+        "loginLink": "Login"
+    },
+    "profile": {
+        "title": "User Profile",
+        "updateButton": "Update",
+        "myOrders": "My Orders",
+        "passwordNew": "New Password",
+        "passwordNewPlaceholder": "Enter new password",
+        "passwordConfirm": "Confirm New Password",
+        "passwordConfirmPlaceholder": "Confirm new password",
+        "updateSuccess": "Profile Updated Successfully!",
+        "passwordsNoMatch": "Passwords do not match",
+        "addressTab": "Shipping Address",
+        "addressDesc": "Update your default shipping address for future checkouts.",
+        "saveAddressButton": "Save Address"
+    },
+    "shipping": {
+        "title": "Shipping Address",
+        "address": "Address",
+        "city": "City",
+        "postalCode": "Postal Code",
+        "country": "Country",
+        "continue": "Continue"
+    },
+    "table": {
+        "id": "ID",
+        "name": "NAME",
+        "email": "EMAIL",
+        "admin": "ADMIN" }
+        ,
+    "payment": {
+        "title": "Payment Method",
+        "selectMethod": "Select Method",
+        "paypal": "PayPal or Credit Card"
+    },
+    "placeOrder": {
+        "title": "Place Order",
+        "shipping": "Shipping",
+        "paymentMethod": "Payment Method",
+        "orderItems": "Order Items",
+        "orderSummary": "Order Summary",
+        "items": "Items",
+        "shippingPrice": "Shipping",
+        "tax": "Tax",
+        "total": "Total",
+        "placeOrderButton": "Place Order"
+    },
+    "dashboard": {
+    "title": "Dashboard",
+    "reports": "Generate Reports",
+    "reportsDesc": "Select a date range to export the detailed order report (paid). Leave blank to export all.",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "export": "Export CSV",
+    "totalSales": "Total Sales",
+    "aov": "Average Order Value",
+    "totalOrders": "Total Orders",
+    "totalCustomers": "Total Customers",
+    "totalProducts": "Total Products",
+    "salesOverTime": "Sales Over Time",
+    "dailySales": "Daily Sales",
+    "topProducts": "Top 5 Selling Products",
+    "quantitySold": "Quantity Sold",
+    "salesByCategory": "Sales by Category",
+    "revenueShare": "Revenue by Category",
+    "topCustomers": "Top 5 Customers",
+    "totalSpent": "Total Spent ($)",
+    "noCustomers": "No customers found",
+    "noData": "No summary data available.",
+    "dailySalesChartLabel": "Daily Sales ($)",
+    "quantitySoldChartLabel": "Quantity Sold",
+    "salesByCategoryChartLabel": "Sales by Category"
+    },
+    
+    "stockReport": {
+    "title": "Low Stock Report (<= 10)",
+    "desc": "Products that require immediate restocking.",
+    "product": "Product",
+    "category": "Category",
+    "stock": "Current Stock",
+    "noStock": "No low stock products found."
+  
+  },
+    "emptySearch": "No results found for",
+    "noOrders": "You have not placed any orders yet."
+
+}

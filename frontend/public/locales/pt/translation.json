@@ -1,0 +1,161 @@
+{
+    "header": {
+        "cart": "Carrinho",
+        "signIn": "Entrar",
+        "profileLink": "Perfil",
+        "logout": "Sair",
+        "admin": "Admin",
+        "users": "Usuários",
+        "products": "Produtos",
+        "orders": "Pedidos"
+    },
+   "footer": {
+        "storeName": "Loja Full Stack",
+        "storeDescription": "O seu destino para os melhores produtos de tecnologia e acessórios.",
+        "quickLinks": "Links Rápidos",
+        "aboutUs": "Sobre Nós",
+        "contact": "Contato",
+        "privacyPolicy": "Política de Privacidade",
+        "followUs": "Siga-nos",
+        "copyright": "Copyright"
+    },
+    "loading": "Carregando...",
+    "searchPlaceholder": "Buscar Produtos...",
+    "searchButton": "Buscar",
+    "latestProducts": "Últimos Produtos",
+    "goBack": "Voltar",
+    "price": "Preço",
+    "description": "Descrição",
+    "status": "Status",
+    "inStock": "Em Estoque",
+    "outOfStock": "Fora de Estoque",
+    "quantity": "Qtd",
+    "addToCart": "Adicionar ao Carrinho",
+    "shoppingCart": "Carrinho de Compras",
+    "emptyCart": "Seu carrinho está vazio",
+    "subtotal": "Subtotal",
+    "items": "itens",
+    "proceedToCheckout": "Finalizar Compra",
+    "about": {
+        "title": "Sobre Nós",
+        "p1": "Bem-vindo à Loja Full Stack! Somos uma equipe apaixonada por tecnologia, dedicada a trazer os melhores e mais recentes produtos eletrônicos para você.",
+        "p2": "Nossa missão é fornecer uma experiência de compra excepcional, com um catálogo de produtos cuidadosamente selecionado, preços competitivos e um atendimento ao cliente de primeira linha. Este projeto foi desenvolvido seguindo as melhores práticas do desenvolvimento web moderno, utilizando a stack MERN (MongoDB, Express, React, Node.js)."
+    },
+    "contact": {
+        "title": "Contato",
+        "p1": "Tem alguma dúvida, sugestão ou feedback? Adoraríamos ouvir de você!",
+        "email": "Email",
+        "phone": "Telefone",
+        "address": "Endereço"
+    },
+    "privacy": {
+        "title": "Política de Privacidade",
+        "p1": "A sua privacidade é importante para nós. É política do site Loja Full Stack respeitar a sua privacidade em relação a qualquer informação sua que possamos coletar no site.",
+        "p2": "Solicitamos informações pessoais apenas quando realmente precisamos delas para lhe fornecer um serviço. Fazemo-lo por meios justos e legais, com o seu conhecimento e consentimento. Também informamos por que estamos coletando e como será usado.",
+        "p3": "Apenas retemos as informações coletadas pelo tempo necessário para fornecer o serviço solicitado. Quando armazenamos dados, protegemos dentro de meios comercialmente aceitáveis para evitar perdas e roubos, bem como acesso, divulgação, cópia, uso ou modificação não autorizados."
+    },
+    "login": {
+        "title": "Entrar",
+        "emailLabel": "Email",
+        "emailPlaceholder": "Digite seu email",
+        "passwordLabel": "Senha",
+        "passwordPlaceholder": "Digite sua senha",
+        "signInButton": "Entrar",
+        "newUserPrompt": "Novo Cliente?",
+        "registerLink": "Registre-se"
+    },
+    "register": {
+        "title": "Registrar",
+        "nameLabel": "Nome",
+        "namePlaceholder": "Digite seu nome",
+        "passwordConfirmLabel": "Confirmar Senha",
+        "passwordConfirmPlaceholder": "Confirme a senha",
+        "registerButton": "Registrar",
+        "hasAccountPrompt": "Já tem uma conta?",
+        "loginLink": "Entrar"
+    },
+    "profile": {
+        "title": "Perfil do Usuário",
+        "updateButton": "Atualizar",
+        "myOrders": "Meus Pedidos",
+        "passwordNew": "Nova Senha",
+        "passwordNewPlaceholder": "Digite a nova senha",
+        "passwordConfirm": "Confirmar Nova Senha",
+        "passwordConfirmPlaceholder": "Confirme a nova senha",
+        "updateSuccess": "Perfil Atualizado com Sucesso!",
+        "passwordsNoMatch": "As senhas não coincidem",
+        "addressTab": "Endereço de Envio",
+        "addressDesc": "Atualize o seu endereço de envio padrão para compras futuras.",
+        "saveAddressButton": "Salvar Endereço"
+    },
+    "shipping": {
+        "title": "Endereço de Entrega",
+        "address": "Endereço",
+        "city": "Cidade",
+        "postalCode": "CEP",
+        "country": "País",
+        "continue": "Continuar"
+    },
+    "table": {
+        "id": "ID",
+        "name": "NOME",
+        "email": "EMAIL",
+        "admin": "ADMIN"
+    },
+    "payment": {
+        "title": "Método de Pagamento",
+        "selectMethod": "Selecione o Método",
+        "paypal": "PayPal ou Cartão de Crédito"
+    },
+    "placeOrder": {
+        "title": "Finalizar Pedido",
+        "shipping": "Entrega",
+        "paymentMethod": "Método de Pagamento",
+        "orderItems": "Itens do Pedido",
+        "orderSummary": "Resumo do Pedido",
+        "items": "Itens",
+        "shippingPrice": "Frete",
+        "tax": "Imposto",
+        "total": "Total",
+        "placeOrderButton": "Finalizar Pedido"
+    },
+    "dashboard": {
+    "title": "Dashboard",
+    "reports": "Gerar Relatórios",
+    "reportsDesc": "Selecione um intervalo de datas para exportar o relatório detalhado de pedidos (pagos). Deixe em branco para exportar tudo.",
+    "startDate": "Data Inicial",
+    "endDate": "Data Final",
+    "export": "Exportar CSV",
+    "totalSales": "Total de Vendas",
+    "aov": "Ticket Médio",
+    "totalOrders": "Total de Pedidos",
+    "totalCustomers": "Total de Clientes",
+    "totalProducts": "Total de Produtos",
+    "salesOverTime": "Vendas ao Longo do Tempo",
+    "dailySales": "Vendas Diárias",
+    "topProducts": "Top 5 Produtos Mais Vendidos",
+    "quantitySold": "Quantidade Vendida",
+    "salesByCategory": "Vendas por Categoria",
+    "revenueShare": "Receita por Categoria",
+    "topCustomers": "Top 5 Clientes",
+    "totalSpent": "Total Gasto (R$)",
+    "noCustomers": "Nenhum cliente encontrado",
+    "noData": "Não há dados de resumo disponíveis.",
+    "dailySalesChartLabel": "Vendas Diárias (R$)",
+    "quantitySoldChartLabel": "Quantidade Vendida",
+    "salesByCategoryChartLabel": "Vendas por Categoria"
+  },
+    "emptySearch": "Nenhum resultado encontrado para",
+    "noOrders": "Você ainda não fez nenhum pedido.",
+ 
+    "stockReport": {
+    "title": "Relatório de Stock Baixo (<= 10)",
+    "desc": "Produtos que precisam de reposição imediata.",
+    "product": "Produto",
+    "category": "Categoria",
+    "stock": "Stock Atual",
+    "noStock": "Nenhum produto com stock baixo."
+    }
+}
+
+    

@@ -1,0 +1,137 @@
+body {
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+/* Estilos do Footer */
+footer {
+  background-color: #343a40; /* Cor escura do nosso header */
+  color: #f8f9fa; /* Cor clara para o texto */
+  padding-top: 3rem;
+  padding-bottom: 1rem;
+}
+
+footer h5 {
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+footer a {
+  color: #f8f9fa;
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+footer a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+footer .list-unstyled li {
+    margin-bottom: 0.5rem;
+}
+
+/* Estilos do Carrossel de Produtos (Versão Final) */
+
+.product-carousel {
+  margin-bottom: 2rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* NOVO: Adiciona um fundo circular semi-transparente para as setas */
+.carousel-control-prev,
+.carousel-control-next {
+  background-color: rgba(0, 0, 0, 0.3);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.8;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  opacity: 1;
+}
+
+/* REMOVIDO: O filter: invert(1) não é mais necessário pois as setas agora têm fundo */
+
+/* Deixa os indicadores (bolinhas) de slide escuros */
+.carousel-indicators [data-bs-target] {
+  background-color: #333;
+}
+
+.carousel-image {
+  height: 500px;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* NOVO: Adiciona um fundo semi-transparente à legenda para garantir a leitura */
+.carousel-caption {
+  position: absolute;
+  bottom: 5%; /* Ajusta a posição vertical */
+  left: 5%;
+  right: 5%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fundo da legenda */
+  padding: 1rem;
+  border-radius: 0.5rem;
+  text-shadow: none; /* Remove a sombra de texto anterior, já que agora temos um fundo */
+}
+
+/* Deixa o carrossel menor em telas de celular */
+@media (max-width: 768px) {
+  .carousel-image {
+    height: 300px;
+  }
+  .carousel-caption h2 {
+    font-size: 1.25rem;
+  }
+}
+/* ---- Animações e Transições ---- */
+
+/* Efeito de 'elevação' nos cards de produto ao passar o mouse */
+.card {
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Transição suave para botões e links */
+.btn, a {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Efeito de zoom sutil em imagens dentro de links */
+a:hover img {
+    transform: scale(1.05);
+}
+
+/* Garante que o efeito de zoom não 'vaze' para fora do card */
+.card-img-top {
+    overflow: hidden;
+}
+
+.card-img-top a img {
+    transition: transform 0.3s ease-in-out;
+}
+.rating span {
+    margin: 0.1rem;
+    color: #f8e825; /* Cor amarela para as estrelas */
+}
