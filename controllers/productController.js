@@ -168,7 +168,27 @@ const createProductReview = async (req, res) => {
     }
 };
 
-// BLOCO DE EXPORTAÇÃO CORRIGIDO E SEM DUPLICADOS
+// @desc    Obter produtos com stock baixo
+// @route   GET /api/products/stock/low
+// @access  Privado/Admin
+const getLowStockProducts = async (req, res) => {
+  try {
+    // Define o limite. Pode ser ?threshold=5, ou 10 por defeito
+    const threshold = Number(req.query.threshold) || 10;
+
+    const products = await Product.find({ countInStock: { $lte: threshold } })
+      .sort({ countInStock: 1 }) // Ordena do mais baixo para o mais alto
+      .select('name category countInStock'); // Seleciona apenas os campos necessários
+
+    if (products) {
+      res.json(products);
+    } else {
+      res.status(404).json({ message: 'Nenhum produto encontrado' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Erro no servidor' });
+  }
+};
 export { 
     getProducts, 
     getProductById, 
@@ -177,5 +197,6 @@ export {
     updateProduct, 
     getTopProducts,
     getProductForEdit,
-    createProductReview
+    createProductReview,
+    getLowStockProducts
 };

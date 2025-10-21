@@ -1,5 +1,8 @@
 // controllers/orderController.js
 import Order from '../models/orderModel.js';
+import User from '../models/userModel.js';
+import Product from '../models/productModel.js';
+import { Parser } from 'json2csv'; // <-- 1. IMPORTADO
 
 // @desc    Criar novo pedido
 // @route   POST /api/orders
@@ -38,6 +41,10 @@ const createdOrder = await order.save();
      res.status(400).json({ message: error.message });
   }
 };
+
+// @desc    Obter pedido por ID
+// @route   GET /api/orders/:id
+// @access  Privado
 const getOrderById = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id).populate(
@@ -55,13 +62,17 @@ const getOrderById = async (req, res) => {
         res.status(404).json({ message: 'Pedido não encontrado' });
     }
 };
+
+// @desc    Atualizar pedido para pago
+// @route   PUT /api/orders/:id/pay
+// @access  Privado
 const updateOrderToPaid = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);
         if (order) {
             order.isPaid = true;
             order.paidAt = Date.now();
-            order.paymentResult = { // Detalhes vindos do PayPal
+            order.paymentResult = { 
                 id: req.body.id,
                 status: req.body.status,
                 update_time: req.body.update_time,
@@ -76,6 +87,7 @@ const updateOrderToPaid = async (req, res) => {
         res.status(500).json({ message: 'Erro no servidor' });
     }
 };
+
 // @desc    Buscar pedidos do usuário logado
 // @route   GET /api/orders/myorders
 // @access  Privado
@@ -87,6 +99,7 @@ const getMyOrders = async (req, res) => {
         res.status(500).json({ message: 'Erro no servidor' });
     }
 };
+
 // @desc    Buscar todos os pedidos (admin)
 // @route   GET /api/orders
 // @access  Privado/Admin
@@ -117,4 +130,246 @@ const updateOrderToDelivered = async (req, res) => {
         res.status(500).json({ message: 'Erro no servidor' });
     }
 };
-export { addOrderItems, getOrderById, updateOrderToPaid, getMyOrders, getOrders, updateOrderToDelivered  };
+
+// @desc    Obter resumo do dashboard (admin)
+// @route   GET /api/orders/summary
+// @access  Privado/Admin
+const getSalesSummary = async (req, res) => {
+    try {
+        // 1. Agregação de Pedidos (Total de Vendas e Número de Pedidos)
+        const ordersSummary = await Order.aggregate([
+            {
+                $match: { isPaid: true }
+            },
+            {
+                $group: {
+                    _id: null,
+                    numOrders: { $sum: 1 },
+                    totalSales: { $sum: '$totalPrice' }
+                }
+            }
+        ]);
+
+        // 2. Contagem de Utilizadores
+        const numUsers = await User.countDocuments();
+
+        // 3. Contagem de Produtos
+        const numProducts = await Product.countDocuments();
+
+        // 4. Vendas ao Longo do Tempo (Gráfico de Linha)
+        const salesOverTime = await Order.aggregate([
+            {
+                $match: { isPaid: true }
+            },
+            {
+                $project: { 
+                    date: { $dateToString: { format: "%Y-%m-%d", date: "$paidAt" } },
+                    totalPrice: 1
+                }
+            },
+            {
+                $group: {
+                    _id: '$date',
+                    dailySales: { $sum: '$totalPrice' }
+                }
+            },
+            {
+                $sort: { _id: 1 } 
+            }
+        ]);
+
+        // 5. Produtos Mais Vendidos (Gráfico de Barras)
+        const topSellingProducts = await Order.aggregate([
+            {
+                $match: { isPaid: true }
+            },
+            {
+                $unwind: '$orderItems'
+            },
+            {
+                $group: {
+                    _id: '$orderItems.product',
+                    name: { $first: '$orderItems.name' }, 
+                    totalQuantitySold: { $sum: '$orderItems.qty' }
+                }
+            },
+            {
+                $sort: { totalQuantitySold: -1 } 
+            },
+            {
+                $limit: 5 
+            }
+        ]);
+
+        // 6. Vendas por Categoria (Gráfico de Rosca)
+        const salesByCategory = await Order.aggregate([
+            {
+                $match: { isPaid: true }
+            },
+            {
+                $unwind: '$orderItems'
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'orderItems.product',
+                    foreignField: '_id',
+                    as: 'productInfo'
+                }
+            },
+            {
+                $unwind: '$productInfo'
+            },
+            {
+                $group: {
+                    _id: '$productInfo.category.pt',
+                    totalSales: { $sum: { $multiply: ['$orderItems.qty', '$productInfo.price'] } } 
+                }
+            },
+            {
+                $sort: { totalSales: -1 } 
+            }
+        ]);
+
+        // 7. Top 5 Clientes (por valor gasto)
+        const topCustomers = await Order.aggregate([
+            {
+                $match: { isPaid: true }
+            },
+            {
+                $group: {
+                    _id: '$user',
+                    totalSpent: { $sum: '$totalPrice' },
+                    totalOrders: { $sum: 1 }
+                }
+            },
+            {
+                $lookup: { 
+                    from: 'users',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'userInfo'
+                }
+            },
+            {
+                $unwind: '$userInfo'
+            },
+            {
+                $project: { 
+                    _id: 0,
+                    name: '$userInfo.name',
+                    email: '$userInfo.email',
+                    totalSpent: 1,
+                    totalOrders: 1
+                }
+            },
+            {
+                $sort: { totalSpent: -1 } 
+            },
+            {
+                $limit: 5
+            }
+        ]);
+
+        // Retorna tudo num único objeto
+        res.json({
+            ordersSummary: ordersSummary.length > 0 ? ordersSummary[0] : { numOrders: 0, totalSales: 0 },
+            numUsers,
+            numProducts,
+            salesOverTime,
+            topSellingProducts,
+            salesByCategory,
+            topCustomers
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Erro ao buscar resumo do dashboard" });
+    }
+};
+
+// --- 2. NOVA FUNÇÃO DE EXPORTAÇÃO ---
+// @desc    Exportar pedidos detalhados (admin)
+// @route   GET /api/orders/export
+// @access  Privado/Admin
+const exportOrders = async (req, res) => {
+    try {
+        const { startDate, endDate } = req.query;
+
+        // Monta o filtro de data (apenas pedidos pagos)
+        const dateFilter = { isPaid: true };
+        if (startDate && endDate) {
+            dateFilter.paidAt = {
+                $gte: new Date(startDate),
+                $lte: new Date(endDate),
+            };
+        }
+
+        // Agregação para "achatar" os dados (uma linha por item de pedido)
+        const orders = await Order.aggregate([
+            { $match: dateFilter },
+            { $lookup: { from: 'users', localField: 'user', foreignField: '_id', as: 'userInfo' } },
+            { $unwind: '$userInfo' },
+            { $unwind: '$orderItems' },
+            {
+                $project: {
+                    _id: 0,
+                    'ID Pedido': '$_id',
+                    'Data': { $dateToString: { format: "%Y-%m-%d %H:%M", date: "$paidAt" } },
+                    'Cliente': '$userInfo.name',
+                    'Cliente Email': '$userInfo.email',
+                    'SKU (ID Produto)': '$orderItems.product',
+                    'Produto': '$orderItems.name',
+                    'Qtd.': '$orderItems.qty',
+                    'Preço Unit.': '$orderItems.price',
+                    'Total Item': { $multiply: ['$orderItems.qty', '$orderItems.price'] },
+                    'Endereço': '$shippingAddress.address',
+                    'Cidade': '$shippingAddress.city',
+                    'País': '$shippingAddress.country',
+                    'CEP': '$shippingAddress.postalCode',
+                    'Método Pgto.': '$paymentMethod',
+                    'Subtotal Pedido': '$itemsPrice',
+                    'Frete': '$shippingPrice',
+                    'Taxa': '$taxPrice',
+                    'Total Pedido': '$totalPrice'
+                }
+            },
+            { $sort: { 'Data': 1 } }
+        ]);
+
+        if (orders.length === 0) {
+            res.status(404).json({ message: 'Nenhum pedido encontrado para exportar.' });
+            return;
+        }
+
+        // Define os cabeçalhos das colunas no CSV
+        const fields = [
+            'ID Pedido', 'Data', 'Cliente', 'Cliente Email', 'SKU (ID Produto)', 'Produto',
+            'Qtd.', 'Preço Unit.', 'Total Item', 'Endereço', 'Cidade', 'País', 'CEP',
+            'Método Pgto.', 'Subtotal Pedido', 'Frete', 'Taxa', 'Total Pedido'
+        ];
+        
+        const json2csvParser = new Parser({ fields });
+        const csv = json2csvParser.parse(orders);
+
+        res.header('Content-Type', 'text/csv');
+        res.attachment('relatorio-pedidos.csv');
+        res.send(csv);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Erro ao exportar pedidos" });
+    }
+};
+
+// Exporta todas as funções
+export { 
+    addOrderItems, 
+    getOrderById, 
+    updateOrderToPaid, 
+    getMyOrders, 
+    getOrders, 
+    updateOrderToDelivered, 
+    getSalesSummary,
+    exportOrders // <-- 3. ADICIONADO À EXPORTAÇÃO
+};

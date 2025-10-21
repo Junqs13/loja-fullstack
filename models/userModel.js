@@ -3,6 +3,15 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+// --- 1. ADICIONADO (Copiado do seu orderModel) ---
+const shippingAddressSchema = mongoose.Schema({
+  address: { type: String, required: true },
+  city: { type: String, required: true },
+  postalCode: { type: String, required: true },
+  country: { type: String, required: true },
+});
+// ------------------------------------------------
+
 const userSchema = mongoose.Schema(
   {
     name: {
@@ -23,6 +32,9 @@ const userSchema = mongoose.Schema(
       required: true,
       default: false,
     },
+    // --- 2. ADICIONADO ---
+    shippingAddress: shippingAddressSchema,
+    // ---------------------
   },
   {
     timestamps: true,
