@@ -1,3 +1,4 @@
+// routes/orderRoutes.js
 import express from 'express';
 const router = express.Router();
 import {
@@ -8,7 +9,8 @@ import {
   getOrders,
   updateOrderToDelivered,
   getSalesSummary,
-  exportOrders // <-- IMPORTADO
+  exportOrders,
+  getPendingOrders // <-- 1. IMPORTADO
 } from '../controllers/orderController.js';
 import { protect, admin } from '../middleware/authMiddleware.js';
 
@@ -19,9 +21,10 @@ router.route('/')
 // --- Rotas Específicas ---
 router.route('/myorders').get(protect, getMyOrders);
 router.route('/summary').get(protect, admin, getSalesSummary);
-
-// --- NOVA ROTA DE EXPORTAÇÃO ---
 router.route('/export').get(protect, admin, exportOrders); 
+
+// --- 2. NOVA ROTA DE PEDIDOS PENDENTES ---
+router.route('/pending').get(protect, admin, getPendingOrders); // <-- ADICIONADO
 
 // --- Rotas com parâmetros (devem vir por último) ---
 router.route('/:id')
@@ -32,6 +35,5 @@ router.route('/:id/pay')
 
 router.route('/:id/deliver')
     .put(protect, admin, updateOrderToDelivered);
-
 
 export default router;

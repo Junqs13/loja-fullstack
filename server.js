@@ -8,22 +8,31 @@ import productRoutes from './routes/productRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import configRoutes from './routes/configRoutes.js';
-import cors from 'cors'; // <-- 1. IMPORTAR (já estava correto)
+import cors from 'cors'; 
 
 dotenv.config();
 connectDatabase();
 
 const app = express();
 
-// --- 2. CONFIGURAR O CORS ---
+// --- CONFIGURAÇÃO DE CORS ATUALIZADA ---
 const corsOptions = {
   // Substitua pela URL exata do seu site no Netlify
   origin: 'https://loja-fullstack.netlify.app', 
+  // Define quais métodos a API aceita
+  methods: 'GET,POST,PUT,DELETE', 
+  // Define quais headers a API aceita (IMPORTANTE para o token)
+  allowedHeaders: 'Content-Type,Authorization', 
   optionsSuccessStatus: 200
 };
 
-// --- 3. USAR O MIDDLEWARE (ANTES DAS ROTAS) ---
+// Habilita o pre-flight (requisições OPTIONS) para todas as rotas
+// Isto é necessário para que os pedidos com 'Authorization' funcionem
+app.options('*', cors(corsOptions)); 
+
+// Habilita o CORS principal
 app.use(cors(corsOptions));
+// ----------------------------------------
 
 app.use(express.json());
 
