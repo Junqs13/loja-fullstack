@@ -23,10 +23,16 @@ const registerUser = async (req, res) => {
       throw new Error('Usuário já existe');
     }
 
+    // --- 1. LÓGICA DE PROMOÇÃO DO PRIMEIRO ADMIN ---
+    // Verifica se já existe algum documento de utilizador na base de dados
+    const isFirstUser = (await User.countDocuments({})) === 0;
+    // -----------------------------------------------
+
     const user = await User.create({
       name,
       email,
       password, // A senha será criptografada pelo middleware no model
+      isAdmin: isFirstUser, // <-- 2. Define isAdmin=true SE for o primeiro
     });
 
     if (user) {
@@ -34,8 +40,8 @@ const registerUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        isAdmin: user.isAdmin,
-        token: generateToken(user._id), // Usando o helper
+        isAdmin: user.isAdmin, // <-- 3. Retorna o status de admin correto
+        token: generateToken(user._id),
       });
     } else {
       res.status(400);
@@ -84,7 +90,7 @@ const getUserProfile = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 isAdmin: user.isAdmin,
-                shippingAddress: user.shippingAddress, // <-- 1. ALTERAÇÃO AQUI
+                shippingAddress: user.shippingAddress,
             });
         } else {
             res.status(404).json({ message: 'Usuário não encontrado'});
@@ -108,9 +114,7 @@ const updateUserProfile = async (req, res) => {
                 user.password = req.body.password;
             }
 
-            // --- 2. LÓGICA DE ATUALIZAÇÃO DO ENDEREÇO ---
             if (req.body.shippingAddress) {
-                // Se user.shippingAddress não existir, inicializa-o
                 if (!user.shippingAddress) {
                     user.shippingAddress = {};
                 }
@@ -119,7 +123,6 @@ const updateUserProfile = async (req, res) => {
                 user.shippingAddress.postalCode = req.body.shippingAddress.postalCode || user.shippingAddress.postalCode;
                 user.shippingAddress.country = req.body.shippingAddress.country || user.shippingAddress.country;
             }
-            // ----------------------------------------
 
             const updatedUser = await user.save();
 
@@ -128,8 +131,8 @@ const updateUserProfile = async (req, res) => {
                 name: updatedUser.name,
                 email: updatedUser.email,
                 isAdmin: updatedUser.isAdmin,
-                shippingAddress: updatedUser.shippingAddress, // <-- Retorna o endereço atualizado
-                token: generateToken(updatedUser._id), // <-- 3. Usando o helper
+                shippingAddress: updatedUser.shippingAddress, 
+                token: generateToken(updatedUser._id),
             });
 
         } else {
@@ -163,7 +166,7 @@ const deleteUser = async (req, res) => {
             await user.deleteOne();
             res.json({ message: 'Usuário removido com sucesso' });
         } else {
-            res.status(404).json({ message: 'Usuário não encontrado' });
+            res.status(4404).json({ message: 'Usuário não encontrado' });
         }
     } catch (error) {
         res.status(500).json({ message: 'Erro no servidor' });
@@ -196,7 +199,6 @@ const updateUser = async (req, res) => {
         if (user) {
             user.name = req.body.name || user.name;
             user.email = req.body.email || user.email;
-            // Corrigido: Apenas atualiza isAdmin se for explicitamente enviado
             user.isAdmin = req.body.isAdmin === undefined ? user.isAdmin : req.body.isAdmin;
 
             const updatedUser = await user.save();
@@ -213,5 +215,4 @@ const updateUser = async (req, res) => {
         res.status(400).json({ message: 'Erro ao atualizar usuário' });
     }
 };
-
 export { registerUser, authUser, getUserProfile, updateUserProfile, getUsers, deleteUser, getUserById, updateUser  };
