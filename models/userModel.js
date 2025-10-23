@@ -3,14 +3,12 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-// --- 1. ADICIONADO (Copiado do seu orderModel) ---
 const shippingAddressSchema = mongoose.Schema({
   address: { type: String, required: true },
   city: { type: String, required: true },
   postalCode: { type: String, required: true },
   country: { type: String, required: true },
 });
-// ------------------------------------------------
 
 const userSchema = mongoose.Schema(
   {
@@ -32,9 +30,7 @@ const userSchema = mongoose.Schema(
       required: true,
       default: false,
     },
-    // --- 2. ADICIONADO ---
     shippingAddress: shippingAddressSchema,
-    // ---------------------
   },
   {
     timestamps: true,
@@ -43,6 +39,13 @@ const userSchema = mongoose.Schema(
 
 // Método para comparar a senha digitada com a senha no banco de dados
 userSchema.methods.matchPassword = async function (enteredPassword) {
+  // --- CORREÇÃO AQUI ---
+  // Se enteredPassword for null, undefined, ou string vazia, retorna false imediatamente
+  if (!enteredPassword) {
+    return false;
+  }
+  // --------------------
+  // Só chama bcrypt.compare se enteredPassword for uma string não vazia
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
