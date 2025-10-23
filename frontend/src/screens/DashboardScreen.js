@@ -2,40 +2,37 @@
 
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Row, Col, Card, Table, Button, Form } from 'react-bootstrap'; 
-import { LinkContainer } from 'react-router-bootstrap'; 
-import axios from 'axios'; 
-import DatePicker from 'react-datepicker'; 
-import 'react-datepicker/dist/react-datepicker.css'; 
-import { 
-    Chart as ChartJS, 
-    CategoryScale, 
-    LinearScale, 
-    BarElement, 
-    Title, 
-    Tooltip, 
-    Legend, 
+import { Row, Col, Card, Table, Button, Form } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import axios from 'axios';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
     ArcElement,
-    LineElement, 
-    PointElement 
+    LineElement,
+    PointElement
 } from 'chart.js';
-import { Bar, Line, Doughnut } from 'react-chartjs-2'; 
+import { Bar, Line, Doughnut } from 'react-chartjs-2';
 import Loader from '../components/Loader';
 import Message from '../components/Message';
 import { getOrderSummary } from '../actions/orderActions';
 import { useTranslation } from 'react-i18next';
-// --- 1. IMPORTAR CONSTANTES DA API ---
-// (Para as chamadas axios feitas DIRETAMENTE neste ficheiro)
 import { BASE_URL, PRODUCTS_URL, ORDERS_URL } from '../constants/apiConstants.js';
 
-// Registra os componentes necessários do Chart.js
 ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
   ArcElement,
-  LineElement, 
-  PointElement, 
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
   Legend
@@ -43,42 +40,35 @@ ChartJS.register(
 
 const DashboardScreen = () => {
     const dispatch = useDispatch();
-    const { t } = useTranslation(); 
+    const { t } = useTranslation();
 
-    // States para o CSV
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [exportLoading, setExportLoading] = useState(false);
     const [exportError, setExportError] = useState(null);
-    
-    // States para relatórios operacionais
+
     const [lowStock, setLowStock] = useState({ loading: true, error: null, products: [] });
     const [pendingOrders, setPendingOrders] = useState({ loading: true, error: null, orders: [] });
 
-
-    // Selectors do Redux
     const orderSummary = useSelector((state) => state.orderSummary);
     const { loading, error, summary } = orderSummary;
 
     const userLogin = useSelector((state) => state.userLogin);
     const { userInfo } = userLogin;
 
-    // --- USE EFFECTS ---
     useEffect(() => {
         dispatch(getOrderSummary());
     }, [dispatch]);
 
     useEffect(() => {
         const fetchOperationalData = async () => {
-            if (!userInfo) return; 
-            
+            if (!userInfo) return;
+
             const config = {
                 headers: { Authorization: `Bearer ${userInfo.token}` },
             };
 
-            // Fetch Low Stock
             try {
-                // --- 2. USAR AS CONSTANTES DA API ---
                 const { data } = await axios.get(`${BASE_URL}${PRODUCTS_URL}/stock/low`, config);
                 setLowStock({ loading: false, products: data, error: null });
             } catch (err) {
@@ -86,9 +76,7 @@ const DashboardScreen = () => {
                 setLowStock({ loading: false, products: [], error: message });
             }
 
-            // Fetch Pending Orders
             try {
-                // --- 2. USAR AS CONSTANTES DA API ---
                 const { data } = await axios.get(`${BASE_URL}${ORDERS_URL}/pending`, config);
                 setPendingOrders({ loading: false, orders: data, error: null });
             } catch (err) {
@@ -98,10 +86,9 @@ const DashboardScreen = () => {
         };
 
         fetchOperationalData();
-        
+
     }, [userInfo]);
 
-    // --- HANDLERS ---
     const exportHandler = async () => {
         setExportLoading(true);
         setExportError(null);
@@ -109,12 +96,12 @@ const DashboardScreen = () => {
         const params = {};
         if (startDate) {
             const start = new Date(startDate);
-            start.setHours(0, 0, 0, 0); 
+            start.setHours(0, 0, 0, 0);
             params.startDate = start.toISOString();
         }
         if (endDate) {
             const end = new Date(endDate);
-            end.setHours(23, 59, 59, 999); 
+            end.setHours(23, 59, 59, 999);
             params.endDate = end.toISOString();
         }
 
@@ -125,7 +112,6 @@ const DashboardScreen = () => {
         };
 
         try {
-            // --- 2. USAR AS CONSTANTES DA API ---
             const { data } = await axios.get(`${BASE_URL}${ORDERS_URL}/export`, { ...config, params });
             const blob = new Blob([data], { type: 'text/csv;charset=utf-8;' });
             const url = window.URL.createObjectURL(blob);
@@ -146,7 +132,6 @@ const DashboardScreen = () => {
         }
     };
 
-    // --- OPÇÕES E DADOS DOS GRÁFICOS (COM TRADUÇÃO) ---
     const options = {
         responsive: true,
         plugins: {
@@ -169,7 +154,7 @@ const DashboardScreen = () => {
     };
 
     const salesOverTimeData = {
-        labels: summary?.salesOverTime?.map((s) => s._id) || [], 
+        labels: summary?.salesOverTime?.map((s) => s._id) || [],
         datasets: [
             {
                 label: t('dashboard.dailySalesChartLabel', 'Vendas Diárias (R$)'),
@@ -200,12 +185,12 @@ const DashboardScreen = () => {
     };
 
     const categorySalesData = {
-        labels: summary?.salesByCategory?.map((cat) => cat._id) || [], 
+        labels: summary?.salesByCategory?.map((cat) => cat._id) || [],
         datasets: [
             {
                 label: t('dashboard.salesByCategoryChartLabel', 'Vendas por Categoria'),
                 data: summary?.salesByCategory?.map((cat) => cat.totalSales) || [],
-                backgroundColor: [ 
+                backgroundColor: [
                     'rgba(255, 99, 132, 0.7)',
                     'rgba(54, 162, 235, 0.7)',
                     'rgba(255, 206, 86, 0.7)',
@@ -218,19 +203,18 @@ const DashboardScreen = () => {
         ],
     };
 
-    // --- JSX (RETURN) ---
     return (
         <>
             <h1>{t('dashboard.title', 'Dashboard')}</h1>
-            
+
             {loading ? <Loader /> : error ? <Message variant='danger'>{error}</Message> : (
                 summary ? (
                     <>
-                        {/* --- LINHA 0: EXPORTAÇÃO (Traduzido) --- */}
+                        {/* LINHA 0: EXPORTAÇÃO */}
                         <Row>
                             <Col>
-                                <Card 
-                                    className="my-3 p-3" 
+                                <Card
+                                    className="my-3 p-3"
                                     style={{ zIndex: 10, position: 'relative' }}
                                 >
                                     <Card.Title>{t('dashboard.reports', 'Gerar Relatórios')}</Card.Title>
@@ -270,8 +254,8 @@ const DashboardScreen = () => {
                                             </Form.Group>
                                         </Col>
                                         <Col md={4} className="d-flex align-items-end">
-                                            <Button 
-                                                onClick={exportHandler} 
+                                            <Button
+                                                onClick={exportHandler}
                                                 disabled={exportLoading}
                                                 className="w-100"
                                             >
@@ -284,7 +268,7 @@ const DashboardScreen = () => {
                             </Col>
                         </Row>
 
-                        {/* --- LINHA 1: KPIs (Cards) (Traduzido) --- */}
+                        {/* LINHA 1: KPIs */}
                         <Row>
                             <Col lg={2} md={4} sm={6}>
                                 <Card bg="success" text="white" className="my-3">
@@ -331,15 +315,15 @@ const DashboardScreen = () => {
                                 </Card>
                             </Col>
                         </Row>
-                        
-                        {/* --- LINHA: RELATÓRIOS OPERACIONAIS (Lado a Lado) --- */}
+
+                        {/* LINHA: RELATÓRIOS OPERACIONAIS */}
                         <Row>
-                            {/* --- RELATÓRIO DE PEDIDOS PENDENTES --- */}
+                            {/* RELATÓRIO DE PEDIDOS PENDENTES */}
                             <Col md={6}>
                                 <Card className="my-3 p-3">
                                     <Card.Title>{t('pendingOrders.title', 'Pedidos Pendentes de Envio')}</Card.Title>
                                     <Card.Text>{t('pendingOrders.desc', 'Pedidos pagos aguardando envio.')}</Card.Text>
-                                    
+
                                     {pendingOrders.loading ? <Loader /> : pendingOrders.error ? <Message variant='danger'>{pendingOrders.error}</Message> : (
                                         <Table striped bordered hover responsive size="sm">
                                             <thead>
@@ -352,13 +336,14 @@ const DashboardScreen = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {/* --- 3. CORREÇÃO (Array.isArray) --- */}
                                                 {Array.isArray(pendingOrders.orders) && pendingOrders.orders.length > 0 ? (
                                                     pendingOrders.orders.map((order) => (
                                                         <tr key={order._id}>
                                                             <td>{order._id}</td>
                                                             <td>{order.user ? order.user.name : 'Utilizador Removido'}</td>
-                                                            <td>{order.paidAt.substring(0, 10)}</td>
+                                                            {/* --- CORREÇÃO AQUI --- */}
+                                                            <td>{order.paidAt ? order.paidAt.substring(0, 10) : 'N/A'}</td>
+                                                            {/* -------------------- */}
                                                             <td>R$ {order.totalPrice.toFixed(2)}</td>
                                                             <td>
                                                                 <LinkContainer to={`/admin/order/${order._id}`}>
@@ -382,12 +367,12 @@ const DashboardScreen = () => {
                                 </Card>
                             </Col>
 
-                            {/* --- RELATÓRIO DE STOCK BAIXO --- */}
+                            {/* RELATÓRIO DE STOCK BAIXO */}
                             <Col md={6}>
                                 <Card className="my-3 p-3">
                                     <Card.Title>{t('stockReport.title', 'Relatório de Stock Baixo')}</Card.Title>
                                     <Card.Text>{t('stockReport.desc', 'Produtos que precisam de reposição...')}</Card.Text>
-                                    
+
                                     {lowStock.loading ? <Loader /> : lowStock.error ? <Message variant='danger'>{lowStock.error}</Message> : (
                                         <Table striped bordered hover responsive size="sm">
                                             <thead>
@@ -398,18 +383,18 @@ const DashboardScreen = () => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {/* --- 3. CORREÇÃO (Array.isArray) --- */}
                                                 {Array.isArray(lowStock.products) && lowStock.products.length > 0 ? (
                                                     lowStock.products.map((product) => (
                                                         <tr key={product._id}>
                                                             <td>
                                                                 <LinkContainer to={`/admin/product/${product._id}/edit`}>
                                                                     <Button variant="light" size="sm" className="w-100 text-start">
-                                                                        {product.name.pt}
+                                                                        {/* Adiciona verificação para name e category (caso sejam multilíngues) */}
+                                                                        {product.name?.pt || product.name || 'Nome Indisponível'}
                                                                     </Button>
                                                                 </LinkContainer>
                                                             </td>
-                                                            <td>{product.category.pt}</td>
+                                                            <td>{product.category?.pt || product.category || 'Categoria Indisponível'}</td>
                                                             <td>
                                                                 <strong style={{ color: 'red' }}>{product.countInStock}</strong>
                                                             </td>
@@ -429,7 +414,7 @@ const DashboardScreen = () => {
                             </Col>
                         </Row>
 
-                        {/* --- LINHA: Gráfico de Vendas ao Longo do Tempo --- */}
+                        {/* LINHA: Gráfico Vendas */}
                         <Row>
                             <Col>
                                 <Card className="my-3 p-3">
@@ -439,7 +424,7 @@ const DashboardScreen = () => {
                             </Col>
                         </Row>
 
-                        {/* --- LINHA: Gráficos de Produto e Categoria --- */}
+                        {/* LINHA: Gráficos Produto e Categoria */}
                         <Row>
                              <Col md={8}>
                                 <Card className="my-3 p-3">
@@ -455,7 +440,7 @@ const DashboardScreen = () => {
                             </Col>
                         </Row>
 
-                        {/* --- LINHA: Top Clientes --- */}
+                        {/* LINHA: Top Clientes */}
                         <Row>
                             <Col>
                                 <Card className="my-3 p-3">
@@ -464,14 +449,13 @@ const DashboardScreen = () => {
                                         <thead>
                                             <tr>
                                                 <th>{t('table.name', 'Nome')}</th>
-                                                <th>{t('table.email', 'Email')}</th> 
+                                                <th>{t('table.email', 'Email')}</th>
                                                 <th>{t('dashboard.totalOrders', 'Nº Pedidos')}</th>
                                                 <th>{t('dashboard.totalSpent', 'Total Gasto (R$)')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {/* --- 3. CORREÇÃO (Array.isArray) --- */}
-                                            {Array.isArray(summary.topCustomers) && summary.topCustomers.length > 0 ? (
+                                            {Array.isArray(summary?.topCustomers) && summary.topCustomers.length > 0 ? (
                                                 summary.topCustomers.map((customer, index) => (
                                                     <tr key={index}>
                                                         <td>{customer.name}</td>

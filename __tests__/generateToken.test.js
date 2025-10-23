@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
-import generateToken from '../../utils/generateToken.js';
+// --- ALTERAÇÃO AQUI ---
+import generateToken from '../utils/generateToken.js'; // Caminho relativo correto (um nível acima)
 
 // Define um segredo JWT mockado para os testes
+// Garante que usa o mesmo nome de variável que o seu código real (JWT_TOKEN)
 process.env.JWT_TOKEN = 'test_secret_key_123';
 
 describe('Função generateToken', () => {
@@ -16,6 +18,7 @@ describe('Função generateToken', () => {
   it('o token gerado deve conter o ID do usuário correto quando decodificado', () => {
     const token = generateToken(testUserId);
     try {
+      // Usa JWT_TOKEN consistentemente
       const decoded = jwt.verify(token, process.env.JWT_TOKEN);
       expect(decoded.id).toBe(testUserId);
     } catch (error) {

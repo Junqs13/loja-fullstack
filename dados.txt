@@ -1,2 +1,6 @@
 
 ADMIN_NETIFLY=admin@admin.com SENHA=senha123
+DNS sentry: 
+https://6b98b1c86f89aa5fcfff4411d2c3319c@o4510234569080832.ingest.us.sentry.io/4510239426412544
+FRONTEND
+https://7cbed637c910d8bbef4cf28fb6f043bc@o4510234569080832.ingest.us.sentry.io/4510239459180544

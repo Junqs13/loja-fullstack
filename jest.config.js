@@ -5,14 +5,8 @@ export default {
   transform: {
     '^.+\\.js$': 'babel-jest',
   },
-  moduleNameMapper: {
-    '^../../models/(.*)$': '<rootDir>/models/$1',
-    '^../../utils/(.*)$': '<rootDir>/utils/$1',
-  },
-  // --- ADICIONADO ---
-  // Carrega as variáveis do .env antes de executar os testes
+  // moduleNameMapper NÃO DEVE ESTAR AQUI (ou comentado)
   setupFiles: ['dotenv/config'],
-  // ------------------
   setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
   forceExit: true,
 };

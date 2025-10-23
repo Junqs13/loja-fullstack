@@ -7,48 +7,70 @@ import {
   PRODUCT_LIST_FAIL,
 } from '../constants/productConstants';
 
-// Descreve o conjunto de testes para o productListReducer
+// Define o estado inicial esperado (igual ao do reducer)
+const initialState = {
+    products: [],
+    loading: false,
+    error: null,
+    page: 1,
+    pages: 1,
+};
+
 describe('productListReducer', () => {
-  
-  // Teste 1: Deve retornar o estado inicial
-  it('should return the initial state', () => {
-    // Ação: chama o reducer sem nenhum estado ou ação
-    // Expectativa: o resultado deve ser o estado inicial definido no reducer
-    expect(productListReducer(undefined, {})).toEqual({ products: [] });
+
+  it('deve retornar o estado inicial', () => {
+    // Ação: chama o reducer sem estado ou ação
+    // Expectativa: retorna o estado inicial definido
+    expect(productListReducer(undefined, {})).toEqual(initialState);
   });
 
-  // Teste 2: Deve lidar com a ação PRODUCT_LIST_REQUEST
-  it('should handle PRODUCT_LIST_REQUEST', () => {
-    // Ação: chama o reducer com uma ação de 'request'
+  it('deve lidar com a ação PRODUCT_LIST_REQUEST', () => {
+    // Ação: envia a ação de request
     const action = { type: PRODUCT_LIST_REQUEST };
-    // Expectativa: o estado deve indicar que o carregamento começou
-    expect(productListReducer({ products: [] }, action)).toEqual({
+    // Expectativa: loading fica true, products fica array vazio, page/pages mantêm-se (ou voltam ao inicial se não existirem antes)
+    expect(productListReducer(initialState, action)).toEqual({
+      ...initialState, // Começa com o estado inicial
       loading: true,
-      products: [],
+      products: [], // Limpa produtos durante o carregamento
     });
   });
 
-  // Teste 3: Deve lidar com a ação PRODUCT_LIST_SUCCESS
-  it('should handle PRODUCT_LIST_SUCCESS', () => {
-    // Ação: chama o reducer com uma ação de 'success' e dados de exemplo
-    const mockProducts = [{ id: 1, name: 'Produto Teste' }];
-    const action = { type: PRODUCT_LIST_SUCCESS, payload: mockProducts };
-    // Expectativa: o carregamento deve terminar e a lista de produtos deve ser preenchida
-    expect(productListReducer({ loading: true, products: [] }, action)).toEqual({
+  it('deve lidar com a ação PRODUCT_LIST_SUCCESS', () => {
+    // --- CORREÇÃO AQUI ---
+    // Simula o payload que a API envia (objeto com products, page, pages)
+    const mockPayload = {
+        products: [{ _id: 1, name: 'Produto Teste' }],
+        page: 1,
+        pages: 1
+    };
+    const action = { type: PRODUCT_LIST_SUCCESS, payload: mockPayload };
+    // Estado antes da ação (simulando que estava a carregar)
+    const previousState = { ...initialState, loading: true, products: [] };
+
+    // Expectativa: loading fica false, e products, page, pages são extraídos do payload
+    expect(productListReducer(previousState, action)).toEqual({
       loading: false,
-      products: mockProducts,
+      products: mockPayload.products, // Espera que o array de produtos seja extraído
+      page: mockPayload.page,         // Espera que a página seja extraída
+      pages: mockPayload.pages,       // Espera que o total de páginas seja extraído
+      error: null
     });
+    // --------------------
   });
 
-  // Teste 4: Deve lidar com a ação PRODUCT_LIST_FAIL
-  it('should handle PRODUCT_LIST_FAIL', () => {
-    // Ação: chama o reducer com uma ação de 'fail' e uma mensagem de erro
+  it('deve lidar com a ação PRODUCT_LIST_FAIL', () => {
+    // Ação: envia a ação de falha
     const mockError = 'Não foi possível carregar os produtos';
     const action = { type: PRODUCT_LIST_FAIL, payload: mockError };
-    // Expectativa: o carregamento deve terminar e o campo de erro deve ser preenchido
-    expect(productListReducer({ loading: true, products: [] }, action)).toEqual({
+    // Estado antes da ação
+    const previousState = { ...initialState, loading: true, products: [] };
+
+    // Expectativa: loading fica false, error é preenchido, products continua vazio, page/pages mantêm-se
+    expect(productListReducer(previousState, action)).toEqual({
+      ...initialState, // Mantém page/pages do estado anterior (ou inicial)
       loading: false,
       error: mockError,
+      products: [],
     });
   });
 
